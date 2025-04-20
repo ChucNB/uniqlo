@@ -180,7 +180,7 @@ let currentProductName = '';
 function loadProductDetails(productId) {
     currentProductId = productId;
     $.ajax({
-        url: `${apiURL}/${productId}`,
+        url: `/api/san-pham-ct/${productId}`,
         type: 'GET',
         success: function (data) {
             currentProductName = data.ten || '';
@@ -216,7 +216,7 @@ function loadProductDetails(productId) {
                         <td>${data.ten || ''}</td>
                         <td>${detail.kichThuoc && detail.kichThuoc.ten ? detail.kichThuoc.ten : ''}</td>
                         <td>${formattedPrice}</td>
-                        <td>${detail.soLuong || ''}</td>
+                        <td>${detail.soLuong || '0'}</td>
                         <td>${detail.mauSac && detail.mauSac.ten ? detail.mauSac.ten : ''}</td>
                         <td>${imageUrl ? `<img src="${imageUrl}" style="width:70px; height:100px;" alt="Ảnh">` : ''}</td>
                         <td>

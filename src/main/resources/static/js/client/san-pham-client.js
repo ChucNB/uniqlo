@@ -147,32 +147,57 @@ function renderProducts(data) {
         var defaultImage = product.anhUrl;
         var hoverImage = (product.anhs && product.anhs.length >= 2) ? product.anhs[1].url : defaultImage;
 
+        // nếu sản phẩm đã bị xoá (ngưng sản xuất)
+        var discontinuedTag = product.isDeleted
+            ? `<span class="badge badge-danger position-absolute" style="top:10px; left:10px; z-index:10;">
+                   Sản phẩm ngưng sản xuất
+               </span>`
+            : "";
+
         var card = $(`
           <div class="col-md-3 product-card mb-3">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow-sm position-relative">
+              ${discontinuedTag}
               <a href="/san-pham/${product.id}">
-                <img src="${defaultImage}" class="card-img-top product-img" alt="${product.ten}" data-default="${defaultImage}" data-hover="${hoverImage}">
+                <img src="${defaultImage}"
+                     class="card-img-top product-img"
+                     alt="${product.ten}"
+                     data-default="${defaultImage}"
+                     data-hover="${hoverImage}">
               </a>
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">
-                  <a href="/san-pham/${product.id}" class="text-decoration-none text-dark">${product.ten}</a>
+                  <a href="/san-pham/${product.id}"
+                     class="text-decoration-none text-dark">
+                    ${product.ten}
+                  </a>
                 </h5>
-                <p class="card-text"><span>Giá: </span> ${minPrice.toLocaleString()} - ${maxPrice.toLocaleString()} VNĐ</p>
-                <p class="card-text"><i class="fas fa-boxes"></i> Tồn: ${product.soLuong.toLocaleString()}</p>
-                <button class="btn btn-primary mt-auto add-to-cart-btn" data-product='${JSON.stringify(product)}'>
-                  <i class="fas fa-shopping-cart"></i> Thêm vào giỏ hàng
+                <p class="card-text"><span>Giá: </span>
+                   ${minPrice.toLocaleString()} - ${maxPrice.toLocaleString()} VNĐ
+                </p>
+                <p class="card-text">
+                  <i class="fas fa-boxes"></i>
+                  Tồn: ${product.soLuong.toLocaleString()}
+                </p>
+                <button class="btn btn-primary mt-auto add-to-cart-btn"
+                        data-product='${JSON.stringify(product)}'>
+                  <i class="fas fa-shopping-cart"></i>
+                  Thêm vào giỏ hàng
                 </button>
               </div>
             </div>
           </div>
         `);
+
         card.find('.product-img').hover(function() {
             $(this).attr('src', $(this).data('hover'));
         }, function() {
             $(this).attr('src', $(this).data('default'));
         });
+
         $("#product-container").append(card);
     });
+
     if (data.totalPages > 1) {
         renderPagination(data.totalPages, data.number);
     } else {

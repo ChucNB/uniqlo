@@ -78,13 +78,28 @@ function renderProductDetail(prod) {
     const rightCol = document.createElement("div");
     rightCol.className = "col-lg-6 col-md-12 product-info";
 
-    // Tên sản phẩm
+    // Rating
+    // Tên sản phẩm${discontinuedTag}
+// Tạo tiêu đề sản phẩm
     const titleEl = document.createElement("h2");
     titleEl.className = "product-title";
     titleEl.textContent = prod.ten;
     rightCol.appendChild(titleEl);
 
-    // Rating
+// Nếu sản phẩm đã ngưng sản xuất
+    if (prod.isDeleted) {
+        const badgeWrapper = document.createElement("div");
+        badgeWrapper.className = "badge badge-danger position-absolute";
+        badgeWrapper.style.top = "10px";
+        badgeWrapper.style.left = "10px";
+        badgeWrapper.style.zIndex = "10";
+        badgeWrapper.textContent = "Sản phẩm ngưng sản xuất";
+
+        rightCol.appendChild(badgeWrapper);
+    }
+
+
+
     const ratingEl = document.createElement("div");
     ratingEl.innerHTML = `
         <span class="product-rating">

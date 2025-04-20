@@ -23,6 +23,17 @@ public class SanPhamRestController {
         var resp=sanPhamAPIService.findAll(request);
         return ResponseEntity.ok(resp);
     }
+    @GetMapping("/api/san-pham-ct/{id}")
+    public ResponseEntity<?> getById2(@ModelAttribute SanPhamSearchRequest request, @PathVariable Long id) {
+        request.setId(List.of(Math.toIntExact(id)));
+        var lstResp=sanPhamAPIService.findAll2(request).getContent();
+        if(lstResp.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy sản phẩm");
+        }else{
+            return ResponseEntity.ok(lstResp.get(0));
+        }
+
+    }
     @GetMapping("/api/san-pham/{id}")
     public ResponseEntity<?> getById(@ModelAttribute SanPhamSearchRequest request, @PathVariable Long id) {
         request.setId(List.of(Math.toIntExact(id)));
