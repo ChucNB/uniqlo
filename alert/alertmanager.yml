@@ -1,0 +1,47 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 30m
+  receiver: 'telegram-notifications'  # default receiver
+
+  # <-- thêm phần này để xử lý riêng alertname=DiskSpaceLow
+  routes:
+    - match:
+        alertname: DiskSpaceLow
+      receiver: 'telegram-disk'
+      group_wait: 20s          # chờ 20s trước khi gửi batch đầu
+      group_interval: 2m       # gom nhóm tối đa 2 phút
+      repeat_interval: 1h      # lặp lại sau 1 giờ nếu không resolve
+
+receivers:
+  - name: 'telegram-notifications'
+    telegram_configs:
+      - bot_token: '7718018394:AAFRmesf730Ut8TgxOharMcZI1Cl8x73oXs'
+        chat_id: 5091659543
+        message: |
+          [{{ .Status | toUpper }}] {{ .GroupLabels.alertname }}  
+          {{ .CommonAnnotations.summary }}
+
+  # receiver riêng cho disk alerts
+  - name: 'telegram-disk'
+    telegram_configs:
+      - bot_token: '7718018394:AAFRmesf730Ut8TgxOharMcZI1Cl8x73oXs'
+        chat_id: 5091659543
+        # Bạn có thể customize message riêng:
+        message: |
+          🚨 *Disk Alert*: {{ .CommonLabels.path }}  
+          *Free:* {{ humanize .CommonAnnotations.freeBytes }}  
+          *Threshold:* {{ .CommonAnnotations.thresholdPct }}%  
+          _{{ .CommonAnnotations.description }}_
+        parse_mode: Markdown
+
+# (tuỳ chọn) annotations trong rule DiskSpaceLow:
+# annotations:
+#   summary: "Ổ đĩa {{ $labels.path }} còn ít hơn 10% dung lượng."
+#   description: "Chỉ còn {{ printf \"%.2f%%\" (disk_free_bytes{path=..} / disk_total_bytes{path=..} *100) }} free."
+#   freeBytes: "{{ printf \"%.2fGiB\" (disk_free_bytes{path=..} / (1024^3)) }}"
+#   thresholdPct: "10"

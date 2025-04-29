@@ -62,6 +62,10 @@ public class SanPhamChiTiet {
     )
     private List<DotGiamGia> dotGiamGias;
 
+    @PostUpdate
+    public void postUpdate() {
+
+    }
 //    @OneToMany(mappedBy = "sanPhamChiTiet")
 //    private Set<SanPhamChiTietDotGiamGia> sanPhamChiTietDotGiamGias = new LinkedHashSet<>();
 

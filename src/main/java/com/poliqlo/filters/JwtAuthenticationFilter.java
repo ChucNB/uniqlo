@@ -6,11 +6,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +21,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
+
+import static com.poliqlo.configurations.SecurityConfig.unAuthURL;
 
 @Component
 @RequiredArgsConstructor
@@ -41,6 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+        if(isUnAuthenticatedPath(request.getRequestURI())){
+            filterChain.doFilter(request, response);
+            return;
+        }
         String authorization = "";
         final Cookie[] cookies = request.getCookies();
         String requestUri = request.getRequestURI();
@@ -82,7 +85,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         email = jwtUtils.extractEmail(jwt);
         if (email!=null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails =userDetailsService.loadUserByUsername(email);
-            if (jwtUtils.isTokenValid(jwt, userDetails)) {
+            if (jwtUtils.isTokenValid(jwt, userDetails,response)) {
                 log.debug("User - {}", userDetails);
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -93,5 +96,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+    private boolean isUnAuthenticatedPath(String path) {
+        AntPathMatcher matcher = new AntPathMatcher();
+        for (String pattern : unAuthURL) {
+            if (matcher.match(pattern, path)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

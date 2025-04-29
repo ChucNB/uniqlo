@@ -27,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -42,15 +43,15 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
 
-    private static final String[] unAuthURL = { "/sign-in/**", "/sign-in", "/sign-up", "/error", "/logout", "/vendor/**","/...", "/js/**", "/css/**", "/fonts/**", "/iphone/**", "/img/**", "/api/v1/admin/data-list-add-san-pham/**", "/api/v2/san-pham/**", "/api/v2/**", "/iphone/**", "/client/**", "/img/**", "/api/v2/san-pham/**", "/unauth-home", "/verify-account", "/reset-otp"
+    public static final String[] unAuthURL = { "/sign-in/**","/favicon.ico", "/sign-in", "/sign-up","/login", "/error", "/logout", "/vendor/**","/...", "/js/**", "/css/**", "/fonts/**", "/iphone/**", "/img/**", "/api/v1/admin/data-list-add-san-pham/**", "/api/v2/san-pham/**", "/api/v2/**", "/iphone/**", "/client/**", "/img/**", "/api/v2/san-pham/**", "/unauth-home", "/verify-account", "/reset-otp"
     };
-    private static final String[] customerURLs = {
-            "/cart/**", "/order/**", "/customer/**", "/unauth-home", "/verify-account", "/reset-otp"
+    public static final String[] customerURLs = {
+            "/cart/**", "/order/**", "/customer/**", "/unauth-home", "/verify-account", "/reset-otp","/lichsumuahang","/thong-tin-khach-hang"
     };
-    private static final String[] employeeURLs = {
+    public static final String[] employeeURLs = {
             "/admin/**"
     };
-    private static final String[] adminOnlyUrls = {
+    public static final String[] adminOnlyUrls = {
             "/admin/nhan-vien/**","/admin"
     };
 
@@ -174,12 +175,15 @@ public class SecurityConfig {
 
                 )
                 .formLogin(formlg->formlg
+                        .loginProcessingUrl("/login")
+
                         .successHandler((request, response, authentication) ->
                                 response.setStatus(200)
                         )
                         .failureHandler((request, response, exception) ->
                                 response.setStatus(401)
                         )
+
                         .failureUrl("/sign-in")
 
                 )
@@ -190,8 +194,8 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/sign-in")
                         .invalidateHttpSession(true)
                         .deleteCookies("Authorization")
-                );
-//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT vẫn hoạt động song song
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT vẫn hoạt động song song
 
         return http.build();
     }

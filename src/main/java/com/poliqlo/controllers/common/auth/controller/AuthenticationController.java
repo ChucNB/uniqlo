@@ -4,10 +4,18 @@ import com.poliqlo.controllers.common.auth.model.request.SignInRequest;
 import com.poliqlo.controllers.common.auth.model.request.SignUpRequest;
 import com.poliqlo.models.KhachHang;
 import com.poliqlo.models.TaiKhoan;
+import com.poliqlo.utils.JwtUtils;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -20,7 +28,32 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
     private final HttpSession httpSession;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
+    @Value("${jwt.expiration}")
+    private  int expiration;
+    @PostMapping("/sign-in")
+    @ResponseBody
+    public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password, HttpServletResponse httpServletResponse) {
+        try {
+            TaiKhoan taiKhoan = (TaiKhoan) authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            ).getPrincipal();
 
+            // Tạo JWT sau khi xác thực thành công
+            String jwt = jwtUtils.generateToken(taiKhoan);
+            Cookie cookie = new Cookie("Authorization", jwt);
+            cookie.setPath("/");
+            cookie.setHttpOnly(true);
+            cookie.setSecure(false);
+            cookie.setMaxAge(expiration); // 10 giờ
+            httpServletResponse.addCookie(cookie);
+            return ResponseEntity.ok(jwt);
+
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
+    }
     @GetMapping("/sign-in")
     public String signin(@RequestParam(name = "error", required = false) String error, Model model) {
         model.addAttribute("signin_req", new SignInRequest());

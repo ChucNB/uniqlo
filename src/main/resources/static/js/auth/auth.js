@@ -42,7 +42,7 @@ $(document).ready(function () {
             formData.append("password", $('#password').val())
             $.ajax({
                 type: 'POST',
-                url: '/login',
+                url: '/sign-in',
                 data:formData,
                 processData: false,
                 contentType: false,

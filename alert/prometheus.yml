@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+
+rule_files:
+  - "alert.rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+scrape_configs:
+  - job_name: 'spring-boot-app'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ["172.16.1.156:8080"]
+    authorization:
+      credentials: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcm9tZXRoZXVzQGV4LmNvbSIsImlhdCI6MTc0NTgyMjU5MCwiZXhwIjoxNzQ4NDE0NTkwfQ.2x6hBAPSQTe8SrhHE5OhOUSrgMZkR9SRgOgfSORbSJU"
+
+
+

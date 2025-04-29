@@ -1,0 +1,74 @@
+groups:
+  - name: application.rules
+    rules:
+      - alert: ApplicationStartTooSlow
+        expr: application_started_time_seconds{main_application_class="com.poliqlo.PoliqloApplication"} > 30
+        for: 1s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Ứng dụng khởi động quá lâu"
+          description: "Ứng dụng {{ $labels.main_application_class }} mất hơn 20 giây để start."
+
+  - name: disk.rules
+    rules:
+      - alert: DiskSpaceLow
+        expr: (disk_free_bytes{path="/home/doanh/Documents/uniqlo/."} / disk_total_bytes{path="/home/doanh/Documents/uniqlo/."}) < 0.3
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Ổ đĩa sắp đầy"
+          description: "Ổ đĩa {{ $labels.path }} còn ít hơn 30% dung lượng."
+
+  - name: process.rules
+    rules:
+      - alert: HighCpuUsage
+        expr: process_cpu_usage > 0.8
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU sử dụng cao"
+          description: "Tiến trình JVM đang sử dụng hơn 80% CPU."
+
+  - name: jvm.rules
+    rules:
+      - alert: TooManyThreads
+        expr: jvm_threads_live_threads > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Số lượng thread JVM quá nhiều"
+          description: "Có hơn 100 thread đang chạy trong JVM."
+
+  - name: http.rules
+    rules:
+      - alert: HighHttp5xxErrors
+        expr: rate(http_server_requests_seconds_count{status=~"5.."}[5m]) > 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "HTTP lỗi 5xx tăng cao"
+          description: "Tốc độ lỗi 5xx vượt quá 1 lỗi mỗi giây."
+      - alert: HighHttp4xxErrors
+        expr: rate(http_server_requests_seconds_count{status=~"4.."}[1m]) > 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "HTTP lỗi 4xx tăng cao"
+          description: "Tốc độ lỗi 5xx vượt quá 1 lỗi mỗi giây."
+
+  - name: repository.rules
+    rules:
+      - alert: SlowRepositoryQuery
+        expr: histogram_quantile(0.95, sum(rate(spring_data_repository_invocations_seconds_bucket[5m])) by (le,repository)) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Repository query chậm"
+          description: "95% các query vào repository {{ $labels.repository }} mất hơn 500ms."

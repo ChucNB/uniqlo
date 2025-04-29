@@ -3,14 +3,16 @@ package com.poliqlo.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +26,13 @@ public class JwtUtils {
 
     @Value("${jwt.expiration}")
     Long jwtExpiration;
+    private SecretKey signingKey;
+
+    @PostConstruct
+    public void init() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecretKey);
+        this.signingKey = Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -33,8 +42,12 @@ public class JwtUtils {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, UserDetails userDetails, HttpServletResponse response) throws IOException {
         final String userName = extractEmail(token);
+        if(!userDetails.isEnabled()){
+            response.sendRedirect("/sign-in?error=423");
+            return false;
+        }
         return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
@@ -46,18 +59,18 @@ public class JwtUtils {
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts
                 .builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration * 1000))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+
+                .claims(extraClaims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpiration * 1000))
+                .signWith(signingKey)
                 .compact();
     }
 
     public boolean isTokenExpired(String token) {
         try {
-            var result = extractExpiration(token).before(new Date());
-            return result;
+            return extractExpiration(token).before(new Date());
         } catch (ExpiredJwtException e) {
             System.err.println("Lỗi");
             return true;
@@ -72,15 +85,12 @@ public class JwtUtils {
     private Claims extractAllClaims(String token) throws ExpiredJwtException {
         return Jwts
                 .parser()
-                .setSigningKey(getSigningKey())
+                .verifyWith(signingKey)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
-    private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
+
 
 }

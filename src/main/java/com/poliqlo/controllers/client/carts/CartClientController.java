@@ -1,11 +1,12 @@
 package com.poliqlo.controllers.client.carts;
 
-import com.poliqlo.controllers.client.carts.dto.*;
-import com.poliqlo.controllers.client.carts.mapper.CartDetailMapper;
+import com.poliqlo.controllers.client.carts.dto.BillRequestDTO;
+import com.poliqlo.controllers.client.carts.dto.CartDetailResponseDTO;
+import com.poliqlo.controllers.client.carts.dto.DataRequest;
+import com.poliqlo.controllers.client.carts.dto.QuantityRequest;
 import com.poliqlo.controllers.client.carts.service.CartDetailService;
 import com.poliqlo.controllers.common.auth.service.AuthService;
 import com.poliqlo.models.DiaChi;
-import com.poliqlo.models.KhachHang;
 import com.poliqlo.models.PhieuGiamGia;
 import com.poliqlo.repositories.DiaChiRepository;
 import com.poliqlo.repositories.KhachHangRepository;
@@ -171,19 +172,24 @@ public class CartClientController {
 
     @GetMapping("/api/get-total-product-in-cart")
     public ResponseEntity<?> getTotalProductInCart() {
-        List<CartDetailResponseDTO> responseDTOList = service.getCartDetailByIdCustomer(authService.getCurrentUserDetails().get().getKhachHang().getId());
+        try {
+            List<CartDetailResponseDTO> responseDTOList = service.getCartDetailByIdCustomer(authService.getCurrentUserDetails().get().getKhachHang().getId());
 
-        int totalQuantity = responseDTOList.stream()
-                .mapToInt(item -> {
-                    try {
-                        return item.getQuantity() != null ? Integer.parseInt(item.getQuantity()) : 0;
-                    } catch (NumberFormatException e) {
-                        return 0; // Nếu quantity không phải số, bỏ qua
-                    }
-                })
-                .sum();
-        System.out.println("Tổng số lượng: " + totalQuantity);
-        return ResponseEntity.ok(totalQuantity);
+            int totalQuantity = responseDTOList.stream()
+                    .mapToInt(item -> {
+                        try {
+                            return item.getQuantity() != null ? Integer.parseInt(item.getQuantity()) : 0;
+                        } catch (NumberFormatException e) {
+                            return 0; // Nếu quantity không phải số, bỏ qua
+                        }
+                    })
+                    .sum();
+            System.out.println("Tổng số lượng: " + totalQuantity);
+            return ResponseEntity.ok(totalQuantity);
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.ok(0);
+        }
     }
 
 }

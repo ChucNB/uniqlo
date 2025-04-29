@@ -157,6 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("/api/get-total-product-in-cart")
             .then(response => response.json())
             .then(data => {
+                debugger
                 document.getElementById("cart-number").innerText = data;
                 console.log("so san pham trong cart : ", data)
             })

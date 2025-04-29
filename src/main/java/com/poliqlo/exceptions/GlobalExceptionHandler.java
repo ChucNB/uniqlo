@@ -1,13 +1,17 @@
 package com.poliqlo.exceptions;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -43,14 +47,25 @@ public class GlobalExceptionHandler {
                 .badRequest()
                 .body(Map.of("error", message));
     }
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public Object handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
 
-    // Xử lý Exception chung chung (nên để cuối)
+        return new RedirectView("/error/403.html");
+
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleGeneric(Exception ex) {
-        // Ghi log đầy đủ nhưng trả về message ngắn gọn
-        ex.printStackTrace(); // hoặc log.error(...)
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Đã xảy ra lỗi không mong muốn."));
+    public Object handleException(HttpServletRequest request, Exception ex) {
+        String accept = request.getHeader("Accept");
+        ex.printStackTrace();
+
+        if (accept != null && accept.contains("text/html")) {
+            // Gửi redirect tới trang HTML tĩnh
+            return new RedirectView("/error/500.html");
+        } else {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Có lỗi xảy ra, vui lòng thử lại sau.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 }
