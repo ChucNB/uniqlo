@@ -5,6 +5,8 @@ import com.poliqlo.repositories.TaiKhoanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class TaiKhoanService {
     @Autowired
@@ -42,6 +44,9 @@ public class TaiKhoanService {
             return existsBySoDienThoai(soDienThoai);
         }
         return taiKhoanRepository.existsBySoDienThoaiAndIdNot(soDienThoai, excludeId);
+    }
+    public Optional<TaiKhoan> findByEmail(String email) {
+        return taiKhoanRepository.findByEmail(email);
     }
 
 }

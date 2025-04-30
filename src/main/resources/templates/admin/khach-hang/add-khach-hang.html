@@ -149,13 +149,18 @@
                             <!-- Email -->
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label required-field">Email</label>
-                                <input type="email" id="email" name="email" class="form-control"  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" required>
+                                <input type="email" id="email" name="email" class="form-control" pattern="[a-zA-Z0-9._%\-+]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" required>
                                 <div class="invalid-feedback">Vui lòng nhập email hợp lệ (VD: example@domain.com).</div>
                                 <div id="emailFeedback" class="validation-feedback">
                                     <i class="fas fa-exclamation-circle"></i> Email này đã được sử dụng, vui lòng chọn email khác.
                                 </div>
                             </div>
-
+                            <!-- Password -->
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label required-field">Mật khẩu</label>
+                                <input type="password" id="password" name="password" class="form-control" pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$" required>
+                                <div class="invalid-feedback">Mật khẩu phải có ít nhất 6 ký tự, chứa ít nhất 1 chữ và 1 số.</div>
+                            </div>
                             <!-- Số điện thoại -->
                             <div class="col-md-6 mb-3">
                                 <label for="soDienThoai" class="form-label required-field">Số điện thoại</label>

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,9 @@ public class KhachHangController {
     private BlobStoreService blobStoreService;
     @Autowired
     private TaiKhoanService taiKhoanService;
+
+    @Autowired
+    private  PasswordEncoder passwordEncoder;
 
     @GetMapping("/list-khach-hang")
     public String listKhachHang(Model model,
@@ -62,6 +66,7 @@ public class KhachHangController {
                                @RequestParam("gioiTinh") String gioiTinh,
                               @RequestParam("email") String email,
                               @RequestParam("soDienThoai") String soDienThoai,
+                               @RequestParam("password") String password,
                               @RequestParam("anhUrl") MultipartFile file,
                               RedirectAttributes redirectAttributes) {
 //        // Kiểm tra email đã tồn tại
@@ -79,6 +84,7 @@ public class KhachHangController {
         TaiKhoan taiKhoan = new TaiKhoan();
         taiKhoan.setEmail(email);
         taiKhoan.setSoDienThoai(soDienThoai);
+        taiKhoan.setPassword(passwordEncoder.encode(password));
         if (!file.isEmpty()) {
             try {
                 var blobResponse = blobStoreService.upload(file);
@@ -131,9 +137,10 @@ public class KhachHangController {
     public String updateKhachHang(@PathVariable Integer id,
                                  @ModelAttribute("khachHang") KhachHang khachHang,
                                  @RequestParam(value = "anhUrl", required = false) MultipartFile file,
+                                  @RequestParam(value = "password", required = false) String password,
                                  RedirectAttributes redirectAttributes) {
         try {
-            khachHangService.updateKhachHang(id, khachHang, file);
+            khachHangService.updateKhachHang(id, khachHang, file, password);
             redirectAttributes.addFlashAttribute("successMessage", "Cập nhật khach hang thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi cập nhật: " + e.getMessage());

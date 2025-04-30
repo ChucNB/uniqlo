@@ -10,8 +10,10 @@ import io.jsonwebtoken.io.IOException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +30,9 @@ public class NhanVienService {
     private TaiKhoanService taiKhoanService;
     @Autowired
     private TaiKhoanRepository taiKhoanRepository;
+    @Qualifier("passwordEncoder")
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public void saveNhanVien(NhanVien nhanVien) {
         nhanVienRepository.save(nhanVien);
@@ -74,7 +79,7 @@ public class NhanVienService {
             taiKhoanRepository.save(taiKhoan);
         }
     }
-    public void updateNhanVien(Integer id, NhanVien updatedNhanVien, MultipartFile file) throws IOException, java.io.IOException {
+    public void updateNhanVien(Integer id, NhanVien updatedNhanVien, MultipartFile file, String newPassword ) throws IOException, java.io.IOException {
         NhanVien nhanVien = nhanVienRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Nhân viên không tồn tại"));
 
@@ -82,6 +87,9 @@ public class NhanVienService {
         taiKhoan.setEmail(updatedNhanVien.getTaiKhoan().getEmail());
         taiKhoan.setSoDienThoai(updatedNhanVien.getTaiKhoan().getSoDienThoai());
         taiKhoan.setRole(updatedNhanVien.getTaiKhoan().getRole());
+        if (newPassword != null && !newPassword.isEmpty()) {
+            taiKhoan.setPassword(passwordEncoder.encode(newPassword));
+        }
 
         if (file != null && !file.isEmpty()) {
             var blobResponse = blobStoreService.upload(file);

@@ -171,9 +171,10 @@ public class NhanVienController {
     public String updateNhanVien(@PathVariable Integer id,
                                  @ModelAttribute("nhanVien") NhanVien nhanVien,
                                  @RequestParam(value = "anhUrl", required = false) MultipartFile file,
+                                 @RequestParam(value = "password", required = false) String password,
                                  RedirectAttributes redirectAttributes) {
         try {
-            nhanVienService.updateNhanVien(id, nhanVien, file);
+            nhanVienService.updateNhanVien(id, nhanVien, file , password);
             redirectAttributes.addFlashAttribute("successMessage03", "Cập nhật nhân viên thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage02", "Lỗi khi cập nhật: " + e.getMessage());

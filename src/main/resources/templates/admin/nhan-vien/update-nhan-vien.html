@@ -102,7 +102,8 @@
             </div>
             <div class="form-group">
               <label>Mật khẩu</label>
-              <input type="password" class="form-control" value="**********" readonly>
+              <input type="password" class="form-control" name="password" id="password" placeholder="Nhập mật khẩu mới (tùy chọn)">
+              <div class="invalid-feedback">Mật khẩu không được để trống, tối thiểu 6 ký tự, chứa ít nhất 1 chữ cái và 1 số.</div>
             </div>
           </div>
           <div class="col-md-4">
@@ -154,6 +155,7 @@
       const saveButton = document.getElementById("saveChangesBtn");
       const emailInput = document.getElementById("email");
       const phoneInput = document.getElementById("soDienThoai");
+      const passwordInput = document.getElementById("password");
       const emailFeedback = document.getElementById("emailFeedback");
       const phoneFeedback = document.getElementById("phoneFeedback");
       const taiKhoanId = document.querySelector('input[name="taiKhoan.id"]').value;
@@ -196,7 +198,20 @@
                   phoneFeedback.style.display = exists ? "block" : "none";
                 });
       });
-
+      passwordInput.addEventListener("blur", function() {
+        const password = passwordInput.value;
+        if (password) {
+          const passwordRegex = /(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}/;
+          if (!passwordRegex.test(password)) {
+            passwordInput.setCustomValidity("Mật khẩu không được để trống, tối thiểu 6 ký tự, chứa ít nhất 1 chữ cái và 1 số.");
+            form.classList.add("was-validated");
+          } else {
+            passwordInput.setCustomValidity("");
+          }
+        } else {
+          passwordInput.setCustomValidity("");
+        }
+      });
       saveButton.addEventListener("click", function () {
         // Kiểm tra form validation thông thường
         if (!form.checkValidity()) {
@@ -233,7 +248,7 @@
               title: 'Cập nhật thành công!',
               text: 'Thông tin nhân viên đã được cập nhật.',
               showConfirmButton: false,
-              timer: 5000
+              timer: 7000
             }).then(() => {
               window.location.href = "/admin/nhan-vien/list";
             });

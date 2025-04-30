@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +28,8 @@ public class KhachHangService {
     private TaiKhoanService taiKhoanService;
     @Autowired
     private TaiKhoanRepository taiKhoanRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public void saveKhachHang(KhachHang khachHang) {
         khachHangRepository.save(khachHang);
@@ -50,7 +53,7 @@ public class KhachHangService {
     public Page<KhachHang> getAllKhachHangNotDeleted(Pageable pageable) {
         return khachHangRepository.findAllByIsDeletedFalse(pageable);
     }
-    public void updateKhachHang(Integer id, KhachHang updatedKhachHang, MultipartFile file) throws IOException, java.io.IOException {
+    public void updateKhachHang(Integer id, KhachHang updatedKhachHang, MultipartFile file , String newPassword ) throws IOException, java.io.IOException {
         KhachHang khachHang = khachHangRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Nhân viên không tồn tại"));
 
@@ -58,6 +61,9 @@ public class KhachHangService {
         taiKhoan.setEmail(updatedKhachHang.getTaiKhoan().getEmail());
         taiKhoan.setSoDienThoai(updatedKhachHang.getTaiKhoan().getSoDienThoai());
 
+        if (newPassword != null && !newPassword.isEmpty()) {
+            taiKhoan.setPassword(passwordEncoder.encode(newPassword));
+        }
         if (file != null && !file.isEmpty()) {
             var blobResponse = blobStoreService.upload(file);
             taiKhoan.setAnhUrl(blobResponse.getUrl());

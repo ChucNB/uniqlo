@@ -229,6 +229,12 @@
                             <div class="invalid-feedback">Số điện thoại không đúng định dạng Việt Nam (bắt đầu bằng 0 hoặc +84, theo sau là 9 chữ số).</div>
                             <small class="form-text text-muted">Ví dụ: 0912345678, 0235456789, 84912345678 hoặc +84912345678</small>
                         </div>
+                        <div class="form-group">
+                            <label for="password">Nhập mật khẩu mới (tùy chọn)</label>
+                            <input type="password" id="password" name="password" class="form-control"
+                                   pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$">
+                            <div class="invalid-feedback">Mật khẩu phải có ít nhất 6 ký tự, chứa ít nhất 1 chữ và 1 số.</div>
+                        </div>
                     </div>
                 </div>
 
