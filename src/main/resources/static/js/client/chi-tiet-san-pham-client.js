@@ -361,18 +361,9 @@ function renderProductDetail(prod) {
             });
     });
 
-    const buyBtn = document.createElement("button");
-    buyBtn.className = "btn-buy";
-    buyBtn.textContent = "Mua ngay";
-    buyBtn.addEventListener("click", () => {
-        Swal.fire({
-            icon: 'info',
-            title: 'Thanh toán',
-            text: 'Chuyển sang trang thanh toán (demo).'
-        });
-    });
+
     actionButtons.appendChild(cartBtn);
-    actionButtons.appendChild(buyBtn);
+
     rightCol.appendChild(actionButtons);
 
     // Shipping / Policy

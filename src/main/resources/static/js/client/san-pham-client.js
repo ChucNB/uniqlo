@@ -647,33 +647,55 @@ $("#modal-form").on("submit", function(e) {
 
 /***************** Các sự kiện khởi tạo *****************/
 $(document).ready(function() {
-    // Khi load trang, lấy tham số lọc từ URL (nếu có) và gọi API
-    var initialParams = getFilterParams();
-    fetchProducts(initialParams);
+    // Hàm gom mọi thao tác clear filter
+    function clearFilters() {
+        // 1. Reset tất cả input/textarea/select trong form
+        const form = $('#filter-form')[0];
+        form.reset();
 
-    // Sự kiện áp dụng filter khi submit form
-    $("#filter-form").on("submit", function(e) {
+        // 2. Reset Select2
+        $('#thuongHieuSelect, #danhMucSelect, #chatLieuSelect, #kieuDangSelect, #mauSacSelect, #kichThuocSelect, #sortSelect')
+            .val(null)
+            .trigger('change');
+
+        // 3. Reset các trường giá
+        $('#minPrice, #maxPrice').val('');
+
+        // 4. Reset ô tìm kiếm
+        $('#searchBox').val('');
+
+        // 5. Reset radio PriceRange
+        $('input[name="priceRange"]').prop('checked', false);
+    }
+
+    // Hàm load sản phẩm theo filter hiện tại
+    function loadFilteredProducts(page = 0) {
+        const params = getFilterParams();
+        params.page = page;
+        fetchProducts(params);
+    }
+
+    // --- Khi trang load lần đầu ---
+    clearFilters();
+    loadFilteredProducts();
+
+    // --- Submit filter form ---
+    $('#filter-form').on('submit', function(e) {
         e.preventDefault();
-        var queryParams = getFilterParams();
-        queryParams.page = 0;
-        fetchProducts(queryParams);
+        loadFilteredProducts(0);
     });
 
-    // Reset form filter và gọi lại API với các tham số rỗng (hoặc theo URL nếu có)
-    $("#filter-form").on("reset", function() {
-        setTimeout(function() {
-            $("#thuongHieuSelect, #chatLieuSelect, #kieuDangSelect, #mauSacSelect, #kichThuocSelect").val("").trigger("change");
-            $("#danhMucSelect").val("").trigger("change");
-            $("#minPrice, #maxPrice, #sortSelect").val("").trigger("change");
-            $("input[name='priceRange']").prop("checked", false).trigger("change");
-            $('#searchBox').val('').trigger('input');
-            fetchProducts(getFilterParams());
-        }, 100);
+    // --- Reset filter form ---
+    $('#filter-form').on('reset', function(e) {
+        e.preventDefault();      // Ngăn reset mặc định của browser
+        clearFilters();
+        // delay chút để các select trigger xong
+        setTimeout(() => loadFilteredProducts(0), 50);
     });
 
-    // Mở modal thêm giỏ hàng khi click
-    $(document).on("click", ".add-to-cart-btn", function() {
-        var productData = $(this).data("product");
+    // --- Mở modal thêm giỏ hàng ---
+    $(document).on('click', '.add-to-cart-btn', function() {
+        const productData = $(this).data('product');
         openAddToCartModal(productData);
     });
 });

@@ -23,6 +23,11 @@ public class SanPhamRestController {
         var resp=sanPhamAPIService.findAll(request);
         return ResponseEntity.ok(resp);
     }
+    @GetMapping("/api/san-pham-admin")
+    public ResponseEntity<?> getAllAdmin(@ModelAttribute SanPhamSearchRequest request) {
+        var resp=sanPhamAPIService.findAll2(request);
+        return ResponseEntity.ok(resp);
+    }
     @GetMapping("/api/san-pham-ct/{id}")
     public ResponseEntity<?> getById2(@ModelAttribute SanPhamSearchRequest request, @PathVariable Long id) {
         request.setId(List.of(Math.toIntExact(id)));
