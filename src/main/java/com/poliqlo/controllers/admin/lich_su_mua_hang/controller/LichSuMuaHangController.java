@@ -1,6 +1,7 @@
 package com.poliqlo.controllers.admin.lich_su_mua_hang.controller;
 
 import com.poliqlo.controllers.admin.lich_su_mua_hang.service.HoaDonService;
+import com.poliqlo.controllers.common.auth.service.AuthService;
 import com.poliqlo.models.HoaDon;
 import com.poliqlo.models.HoaDonChiTiet;
 import com.poliqlo.models.LichSuHoaDon;
@@ -10,6 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +26,8 @@ public class LichSuMuaHangController {
     private final HoaDonService hoaDonService;
     private HoaDonRepository hoaDonRepository;
     private static final int PAGE_SIZE = 3; // Số đơn hàng trên 1 trang
-
+    @Autowired
+      private  AuthService authService;
     @Autowired
     public LichSuMuaHangController(HoaDonService hoaDonService) {
         this.hoaDonService = hoaDonService;
@@ -30,50 +35,71 @@ public class LichSuMuaHangController {
     // Hiển thị các đơn hàng
     @GetMapping
     public String showOrderHistory(@RequestParam(value = "page", defaultValue = "0") int page, Model model) {
+        if (!authService.isAuthenticated()) {
+            return "redirect:/login"; // Chuyển hướng đến trang đăng nhập nếu chưa đăng nhập
+        }
 
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<HoaDon> hoaDonPage = hoaDonService.getAllActiveOrdersPaged(pageable);
+        Optional<Integer> khachHangIdOpt = authService.getCurrentKhachHangId();
+        if (khachHangIdOpt.isEmpty()) {
+            model.addAttribute("errorMessage", "Tài khoản của bạn không liên kết với khách hàng. Vui lòng liên hệ quản trị viên.");
+            return "client/lich-su-mua-hang/index";
+        }
 
-        addPaginationAttributes(model, hoaDonPage);
-
-        return "client/lich-su-mua-hang/index";
-    }
-     // Lọc theo ID khách hàng
-    @GetMapping("/khachhang/{khachHangId}")
-    public String showOrderHistoryByCustomer(
-            @PathVariable Integer khachHangId,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            Model model) {
-
+        Integer khachHangId = khachHangIdOpt.get();
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Page<HoaDon> hoaDonPage = hoaDonService.getOrdersByCustomerIdPaged(khachHangId, pageable);
 
         addPaginationAttributes(model, hoaDonPage);
         model.addAttribute("khachHangId", khachHangId);
-
         return "client/lich-su-mua-hang/index";
     }
+//     // Lọc theo ID khách hàng
+//    @GetMapping("/khachhang/{khachHangId}")
+//    public String showOrderHistoryByCustomer(
+//            @PathVariable Integer khachHangId,
+//            @RequestParam(value = "page", defaultValue = "0") int page,
+//            Model model) {
+//
+//        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+//        Page<HoaDon> hoaDonPage = hoaDonService.getOrdersByCustomerIdPaged(khachHangId, pageable);
+//
+//        addPaginationAttributes(model, hoaDonPage);
+//        model.addAttribute("khachHangId", khachHangId);
+//
+//        return "client/lich-su-mua-hang/index";
+//    }
 
+    // Lọc đơn hàng theo trạng thái
     // Lọc đơn hàng theo trạng thái
     @GetMapping("/trangthai/{trangThai}")
     public String showOrderHistoryByStatus(
             @PathVariable String trangThai,
             @RequestParam(value = "page", defaultValue = "0") int page,
             Model model) {
+        if (!authService.isAuthenticated()) {
+            return "redirect:/login"; // Chuyển hướng đến trang đăng nhập nếu chưa đăng nhập
+        }
 
+        Optional<Integer> khachHangIdOpt = authService.getCurrentKhachHangId();
+        if (khachHangIdOpt.isEmpty()) {
+            model.addAttribute("errorMessage", "Tài khoản của bạn không liên kết với khách hàng. Vui lòng liên hệ quản trị viên.");
+            return "client/lich-su-mua-hang/index";
+        }
+
+        Integer khachHangId = khachHangIdOpt.get();
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<HoaDon> hoaDonPage ;
-        // Kiểm tra nếu trangThai chứa nhiều trạng thái (phân tách bằng dấu phẩy)
+        Page<HoaDon> hoaDonPage;
+
         if (trangThai.contains(",")) {
             List<String> statuses = Arrays.asList(trangThai.split(","));
-            hoaDonPage = hoaDonService.getOrdersByMultipleStatusesPaged(statuses, pageable);
+            hoaDonPage = hoaDonService.getOrdersByCustomerIdAndStatusPaged(khachHangId, statuses.get(0), pageable);
         } else {
-            hoaDonPage = hoaDonService.getOrdersByStatusPaged(trangThai, pageable);
+            hoaDonPage = hoaDonService.getOrdersByCustomerIdAndStatusPaged(khachHangId, trangThai, pageable);
         }
 
         addPaginationAttributes(model, hoaDonPage);
+        model.addAttribute("khachHangId", khachHangId);
         model.addAttribute("trangThai", trangThai);
-
         return "client/lich-su-mua-hang/index";
     }
 

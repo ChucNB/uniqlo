@@ -45,6 +45,16 @@ public class AuthService {
         }
         return Optional.empty();
     }
+    public Optional<Integer> getCurrentKhachHangId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof TaiKhoan) {
+            TaiKhoan taiKhoan = (TaiKhoan) authentication.getPrincipal();
+            if (taiKhoan.getKhachHang() != null) {
+                return Optional.of(taiKhoan.getKhachHang().getId());
+            }
+        }
+        return Optional.empty();
+    }
 
     public boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

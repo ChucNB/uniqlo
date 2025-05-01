@@ -365,39 +365,18 @@
             </div>
         </div>
 
-        <!-- Phân trang -->
         <div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-4" style="margin-bottom: 20px">
             <nav aria-label="Phân trang">
                 <ul class="pagination">
-                    <!-- Nút Previous -->
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:if="${trangThai == null && khachHangId == null}"
-                           th:href="@{/lichsumuahang(page=${currentPage - 1})}">&laquo;</a>
-                        <a class="page-link" th:if="${trangThai != null}"
-                           th:href="@{'/lichsumuahang/trangthai/' + ${trangThai}(page=${currentPage - 1})}">&laquo;</a>
-                        <a class="page-link" th:if="${khachHangId != null}"
-                           th:href="@{'/lichsumuahang/khachhang/' + ${khachHangId}(page=${currentPage - 1})}">&laquo;</a>
+                        <a class="page-link" th:href="@{/lichsumuahang(page=${currentPage - 1})}">«</a>
                     </li>
-
-                    <!-- Các nút số trang -->
                     <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                         th:classappend="${currentPage == i} ? 'active'">
-                        <a class="page-link" th:if="${trangThai == null && khachHangId == null}"
-                           th:href="@{/lichsumuahang(page=${i})}" th:text="${i + 1}"></a>
-                        <a class="page-link" th:if="${trangThai != null}"
-                           th:href="@{'/lichsumuahang/trangthai/' + ${trangThai}(page=${i})}" th:text="${i + 1}"></a>
-                        <a class="page-link" th:if="${khachHangId != null}"
-                           th:href="@{'/lichsumuahang/khachhang/' + ${khachHangId}(page=${i})}" th:text="${i + 1}"></a>
+                        <a class="page-link" th:href="@{/lichsumuahang(page=${i})}" th:text="${i + 1}"></a>
                     </li>
-
-                    <!-- Nút Next -->
                     <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                        <a class="page-link" th:if="${trangThai == null && khachHangId == null}"
-                           th:href="@{/lichsumuahang(page=${currentPage + 1})}">&raquo;</a>
-                        <a class="page-link" th:if="${trangThai != null}"
-                           th:href="@{'/lichsumuahang/trangthai/' + ${trangThai}(page=${currentPage + 1})}">&raquo;</a>
-                        <a class="page-link" th:if="${khachHangId != null}"
-                           th:href="@{'/lichsumuahang/khachhang/' + ${khachHangId}(page=${currentPage + 1})}">&raquo;</a>
+                        <a class="page-link" th:href="@{/lichsumuahang(page=${currentPage + 1})}">»</a>
                     </li>
                 </ul>
             </nav>
