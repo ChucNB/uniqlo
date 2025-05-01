@@ -85,6 +85,7 @@ public class KhachHangController {
         taiKhoan.setEmail(email);
         taiKhoan.setSoDienThoai(soDienThoai);
         taiKhoan.setPassword(passwordEncoder.encode(password));
+        taiKhoan.setRole(TaiKhoan.Role.ROLE_USER);
         if (!file.isEmpty()) {
             try {
                 var blobResponse = blobStoreService.upload(file);
