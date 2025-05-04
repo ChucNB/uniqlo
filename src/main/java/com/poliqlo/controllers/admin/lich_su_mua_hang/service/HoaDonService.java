@@ -251,4 +251,12 @@
                 hoaDon.setDiaChi(diaChiDayDu);
             }
         }
+        public String getOrderAddressById(Integer hoaDonId) {
+            // Tái sử dụng getOrderById() đã ghép địa chỉ đầy đủ
+            return getOrderById(hoaDonId)
+                    .map(HoaDon::getDiaChi)   // getDiaChi ở đây đã là địa chỉ đầy đủ
+                    .orElseThrow(() ->
+                            new RuntimeException("Không tìm thấy đơn hàng với id " + hoaDonId)
+                    );
+        }
     }

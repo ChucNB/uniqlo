@@ -31,7 +31,7 @@ function loadData() {
             }
         },
         ajax: {
-            url: "/api/san-pham",
+            url: "/api/san-pham-admin",
             type: "GET",
             cache: true,
             dataSrc: function (json) {

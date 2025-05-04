@@ -32,7 +32,7 @@
                     position: relative;
                     #s {
                         padding-right: 50px;
-                        background: lighten(black, 97%);
+                        /*background: lighten(black, 97%);*/
                         border: none;
                     }
                 }
@@ -58,8 +58,8 @@
                     <!-- Thương hiệu -->
                     <div class="form-group mb-3">
                         <label for="thuongHieuSelect"><i class="fas fa-industry"></i> Thương hiệu</label>
-                        <select multiple="multiple" class="form-control" id="thuongHieuSelect">
-                            <option value="">Tất cả</option>anh
+                        <select multiple="multiple" class="form-control" id="thuongHieuSelect"  placeholder="Tất cả" data-placeholder="Tất cả">
+<!--                            <option value="">Tất cả</option>anh-->
                             <th:block th:each="thuongHieu : ${listThuongHieu}">
                                 <option th:value="${thuongHieu.id}" th:text="${thuongHieu.ten}"></option>
                             </th:block>
@@ -68,8 +68,8 @@
                     <!-- Danh mục -->
                     <div class="form-group mb-3">
                         <label for="danhMucSelect"><i class="fas fa-list"></i> Danh mục</label>
-                        <select multiple="multiple" class="form-control" id="danhMucSelect">
-                            <option value="">Tất cả</option>
+                        <select multiple="multiple" class="form-control" id="danhMucSelect"  placeholder="Tất cả" data-placeholder="Tất cả">
+<!--                            <option value="">Tất cả</option>-->
                             <th:block th:each="danhMuc : ${listDanhMuc}">
                                 <option th:value="${danhMuc.id}" th:text="${danhMuc.ten}"></option>
                             </th:block>
@@ -78,8 +78,8 @@
                     <!-- Chất liệu -->
                     <div class="form-group mb-3">
                         <label for="chatLieuSelect"><i class="fas fa-cubes"></i> Chất liệu</label>
-                        <select multiple="multiple" class="form-control" id="chatLieuSelect">
-                            <option value="">Tất cả</option>
+                        <select multiple="multiple" class="form-control" id="chatLieuSelect"  placeholder="Tất cả" data-placeholder="Tất cả">
+<!--                            <option value="">Tất cả</option>-->
                             <th:block th:each="chatLieu : ${listChatLieu}">
                                 <option th:value="${chatLieu.id}" th:text="${chatLieu.ten}"></option>
                             </th:block>
@@ -88,8 +88,8 @@
                     <!-- Kiểu dáng -->
                     <div class="form-group mb-3">
                         <label for="kieuDangSelect"><i class="fas fa-ruler"></i> Kiểu dáng</label>
-                        <select multiple="multiple" class="form-control" id="kieuDangSelect">
-                            <option value="">Tất cả</option>datn
+                        <select multiple="multiple" class="form-control" id="kieuDangSelect"  placeholder="Tất cả" data-placeholder="Tất cả">
+
                             <th:block th:each="kieuDang : ${listKieuDang}">
                                 <option th:value="${kieuDang.id}" th:text="${kieuDang.ten}"></option>
                             </th:block>
@@ -98,8 +98,8 @@
                     <!-- Màu sắc -->
                     <div class="form-group mb-3">
                         <label for="mauSacSelect"><i class="fas fa-palette"></i> Màu sắc</label>
-                        <select multiple="multiple" class="form-control" id="mauSacSelect">
-                            <option value="">Tất cả</option>
+                        <select multiple="multiple" class="form-control" id="mauSacSelect"  placeholder="Tất cả" data-placeholder="Tất cả">
+<!--                            <option value="">Tất cả</option>-->
                             <th:block th:each="mauSac : ${listMauSac}">
                                 <option th:value="${mauSac.id}" th:text="${mauSac.ten}"></option>
                             </th:block>
@@ -108,8 +108,8 @@
                     <!-- Màu sắc -->
                     <div class="form-group mb-3">
                         <label for="kichThuocSelect"><i class="fas fa-ruler-vertical"></i> Kích thước</label>
-                        <select multiple="multiple" class="form-control" id="kichThuocSelect">
-                            <option value="">Tất cả</option>
+                        <select multiple="multiple" class="form-control" id="kichThuocSelect"  placeholder="Tất cả" data-placeholder="Tất cả">
+<!--                            <option value="">Tất cả</option>-->
                             <th:block th:each="kichThuoc : ${listKichThuoc}">
                                 <option th:value="${kichThuoc.id}" th:text="${kichThuoc.ten}"></option>
                             </th:block>

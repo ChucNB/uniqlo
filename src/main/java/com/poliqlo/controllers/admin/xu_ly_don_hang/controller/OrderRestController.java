@@ -2,6 +2,7 @@ package com.poliqlo.controllers.admin.xu_ly_don_hang.controller;
 
 
 import com.poliqlo.controllers.admin.gio_hang.model.response.Response;
+import com.poliqlo.controllers.admin.lich_su_mua_hang.service.HoaDonService;
 import com.poliqlo.controllers.admin.xu_ly_don_hang.model.request.*;
 import com.poliqlo.controllers.admin.xu_ly_don_hang.service.OrderService;
 import com.poliqlo.controllers.common.auth.service.AuthService;
@@ -32,6 +33,8 @@ public class OrderRestController {
 
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private HoaDonService hoaDonService;
     @Autowired
     private HoaDonChiTietRepository hoaDonChiTietRepository;
     @Autowired
@@ -141,6 +144,16 @@ public class OrderRestController {
     @PostMapping("/{orderId}/restore")
     public HoaDon restoreOrder(@PathVariable Integer orderId) {
         return orderService.restoreOrder(orderId);
+    }
+
+    /**
+     * GET /api/orders/{orderId}/address
+     * Trả về địa chỉ đầy đủ của đơn hàng.
+     */
+    @GetMapping("/{orderId}/address")
+    public ResponseEntity<String> getOrderAddress(@PathVariable Integer orderId) {
+        String diaChi = hoaDonService.getOrderAddressById(orderId);
+        return ResponseEntity.ok(diaChi);
     }
 
 

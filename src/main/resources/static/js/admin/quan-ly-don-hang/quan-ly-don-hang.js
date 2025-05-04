@@ -27,6 +27,9 @@ function convertToVietnamese(text) {
 let currentOrder = null;
 let orderId = new URLSearchParams(window.location.search).get('id') || 1;
 let selectedNewStatus = null;
+let orderAddress = "";
+
+// Gọi API lấy địa chỉ
 
 // Danh sách trạng thái
 const statuses = [
@@ -377,32 +380,43 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 // ========== Lấy thông tin đơn hàng & cập nhật UI ========== //
-    function fetchOrderDetails() {
-        fetch('/api/orders/' + orderId)
-            .then(response => {
-                if (!response.ok) throw new Error('Không tìm thấy đơn hàng');
-                return response.json();
-            })
-            .then(order => {
-                currentOrder = order;
-                // Giả sử bạn có hàm này để hiển thị danh sách sản phẩm
-                fetchAndPopulateProductList(orderId);
-                // updateUI
-                updateUI(order);
-                // Hiển thị thông tin đơn hàng
-                populateOrderDetails(order);
+    async function fetchOrderDetails() {
+        try {
+            // 1. Gửi song song 2 request: order và address
+            const [orderRes, addressRes] = await Promise.all([
+                fetch(`/api/orders/${orderId}`),
+                fetch(`/api/orders/${orderId}/address`)
+            ]);
+
+            // 2. Kiểm tra lỗi HTTP
+            if (!orderRes.ok) throw new Error(`Không tìm thấy đơn hàng (status=${orderRes.status})`);
+            if (!addressRes.ok) throw new Error(`Không lấy được địa chỉ (status=${addressRes.status})`);
+
+            // 3. Parse về JSON / text
+            const order = await orderRes.json();
+            orderAddress = (await addressRes.text()).trim();
+            // 4. Lưu vào biến global nếu cần
+            currentOrder = order;if(orderAddress!==""){
+                order.diaChi = orderAddress;
+            }
 
 
-                // Nếu đơn hàng đang ở "LAY_HANG_THANH_CONG", disable thêm/sửa
-                if (order.trangThai === 'LAY_HANG_THANH_CONG') {
-                    disableOrderActions(true)
-                }
-            })
-            .catch(error => {
-                console.error(error);
-                Swal.fire('Lỗi', error.message, 'error');
-            });
+            // 5. Cập nhật UI
+            updateUI(order);                  // ví dụ: show header, timeline, address...
+            populateOrderDetails(order);     // chi tiết chung
+            fetchAndPopulateProductList(orderId); // bảng sản phẩm
+
+            // 6. Disable nút thêm/sửa nếu đã LẤY HÀNG THÀNH CÔNG
+            if (order.trangThai === 'LAY_HANG_THANH_CONG') {
+                disableOrderActions(true);
+            }
+
+        } catch (err) {
+            console.error(err);
+            Swal.fire('Lỗi', err.message, 'error');
+        }
     }
+
 
 // Hiển thị thông tin đơn hàng, timeline, người nhận
     function populateOrderDetails(order) {
@@ -468,6 +482,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <label><strong>Tên người nhận:</strong></label>
                     <div>${order.tenNguoiNhan || 'Chưa cập nhật'}</div>
                 </div>
+
                 <div class="col-md-4 mb-2">
                     <label><strong>Địa chỉ giao hàng:</strong></label>
                     <div>${order.diaChi || ''}</div>
@@ -608,7 +623,7 @@ document.addEventListener("DOMContentLoaded", function () {
     $('#updateOrderModal').on('show.bs.modal', function () {
         if (currentOrder) {
             document.getElementById('tenNguoiNhan').value = currentOrder.tenNguoiNhan || '';
-            document.getElementById('diaChi').value = currentOrder.diaChi || '';
+            document.getElementById('diaChi').value = orderAddress || '';
             document.getElementById('soDienThoai').value = currentOrder.soDienThoai || '';
             document.getElementById('phiVanChuyen').value = currentOrder.phiVanChuyen || '';
             document.getElementById('ghiChu').value = currentOrder.ghiChu || '';
@@ -979,11 +994,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 var totalAmount = quantity * effectivePrice;
                 $("#modal-total").text("Tổng tiền: " + totalAmount.toLocaleString() + " VNĐ");
 
-                if (totalAmount > 5000000) {
-                    $("#modal-total-warning").text("Tổng tiền vượt quá 5 triệu VNĐ!").css("color", "red");
-                } else {
-                    $("#modal-total-warning").text("");
-                }
                 return;
             }
         }
@@ -1268,19 +1278,57 @@ document.addEventListener("DOMContentLoaded", function () {
         addProduct(productId, 1);
     });
 
+// sau khi bạn đã load xong currentOrder trong fetchOrderDetails()
+    document.getElementById('printOrderBtn').addEventListener('click', function() {
+        if (!currentOrder) {
+            Swal.fire('Lỗi', 'Chưa có dữ liệu đơn hàng để in!', 'warning');
+            return;
+        }
+        console.log(currentOrder)
+        // gọi hàm in với object đơn hàng hiện tại
+        printInvoiceFromObject2(currentOrder);
+    });
 
     // Cập nhật thông tin đơn hàng (người nhận, phí vận chuyển, ghi chú)
     document.getElementById('updateOrderInfoForm').addEventListener('submit', function (e) {
         e.preventDefault();
-        const formData = new FormData(e.target);
+
+        const form = e.target;
+        const tenNguoiNhan = form.tenNguoiNhan.value.trim();
+        const diaChi       = form.diaChi.value.trim();
+        const soDienThoai  = form.soDienThoai.value.trim();
+        let   phiVanChuyen = form.phiVanChuyen.value.trim();
+        const ghiChu       = form.ghiChu.value.trim();
+
+        // Validation
+        if (!tenNguoiNhan) {
+            return Swal.fire('Lỗi', 'Tên người nhận không được để trống', 'error');
+        }
+        if (!diaChi) {
+            return Swal.fire('Lỗi', 'Địa chỉ giao hàng không được để trống', 'error');
+        }
+        const phoneRe = /^0\d{9,10}$/;
+        if (!phoneRe.test(soDienThoai)) {
+            return Swal.fire('Lỗi', 'Số điện thoại không hợp lệ (phải bắt đầu 0 và có 10–11 chữ số)', 'error');
+        }
+        // ship fee
+        if (phiVanChuyen === '') {
+            phiVanChuyen = '0';
+        }
+        if (isNaN(phiVanChuyen) || parseFloat(phiVanChuyen) < 0) {
+            return Swal.fire('Lỗi', 'Phí vận chuyển phải là số lớn hơn hoặc bằng 0', 'error');
+        }
+
+        // Chuẩn hoá payload
         const data = {
-            tenNguoiNhan: formData.get('tenNguoiNhan'),
-            diaChi: formData.get('diaChi'),
-            soDienThoai: formData.get('soDienThoai'),
-            phiVanChuyen: formData.get('phiVanChuyen'),
-            ghiChu: formData.get('ghiChu')
+            tenNguoiNhan,
+            diaChi,
+            soDienThoai,
+            phiVanChuyen: parseFloat(phiVanChuyen),
+            ghiChu
         };
-        fetch('/api/orders/' + orderId + '/updateInfo', {
+
+        fetch(`/api/orders/${orderId}/updateInfo`, {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
@@ -1340,6 +1388,167 @@ document.addEventListener("DOMContentLoaded", function () {
             historyBody.innerHTML = `<tr><td colspan="5" class="text-center">Chưa có lịch sử</td></tr>`;
         }
     }
+    function removeVietnameseAccents(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/đ/g, "d").replace(/Đ/g, "D");
+    }
+
+
+    function pad2(n) {
+        return n.toString().padStart(2, '0');
+    }
+    function formatDateVN(dateStr) {
+        if (!dateStr) return 'N/A';
+        const d = new Date(dateStr);
+        const hh = pad2(d.getHours());
+        const mm = pad2(d.getMinutes());
+        const ss = pad2(d.getSeconds());
+        const dd = d.getDate();
+        const MM = d.getMonth() + 1;
+        const yyyy = d.getFullYear();
+        return `${hh}:${mm}:${ss} ${dd}/${MM}/${yyyy}`;
+    }
+    function formatCurrencyVN(num) {
+        if (num == null) return '0';
+        return num
+            .toFixed(0)
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function printInvoiceFromObject2(invoice) {
+        // Chuẩn bị dữ liệu
+        const ngay   = formatDateVN(invoice.ngayDatFromLichSu);
+        const kh     = invoice.tenNguoiNhan || 'Khách lẻ';
+        const phone  = invoice.soDienThoai   || 'Chưa có';
+        const diaChi  = invoice.diaChi   || 'Chưa có';
+        const pay    = convertToVietnamese(invoice.phuongThucThanhToan) || '';
+        const stt    = convertToVietnamese(invoice.trangThai)      || '';
+        const ship   = invoice.phiVanChuyen != null
+            ? formatCurrencyVN(invoice.phiVanChuyen) + ' VND'
+            : '0 VND';
+        const disc   = invoice.giamMaGiamGia
+            ? '-' + formatCurrencyVN(invoice.giamMaGiamGia) + ' VND'
+            : '0 VND';
+        const total  = invoice.tongTien != null
+            ? formatCurrencyVN(invoice.tongTien) + ' VND'
+            : '0 VND';
+
+        // Xây dựng HTML
+        const html = `
+  <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Hóa Đơn Bán Hàng</title>
+      <style>
+        body {
+          font-family: 'Courier New', monospace;
+          font-size: 14px;
+          padding: 10px;
+        }
+        .invoice {
+          width: 380px;
+          border: 1px dashed #000;
+          padding: 10px;
+          margin: auto;
+          line-height: 1.4;
+        }
+        .invoice h2 {
+          margin: 0 0 8px;
+          font-size: 16px;
+          text-align: center;
+        }
+        .invoice p {
+          margin: 4px 0;
+        }
+        .invoice-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 8px 0;
+        }
+        .invoice-table th,
+        .invoice-table td {
+          padding: 2px 4px;
+          border-bottom: 1px dashed #000;
+        }
+        .invoice-table th {
+          text-align: left;
+        }
+        .right {
+          text-align: right;
+        }
+        .totals p {
+          margin: 4px 0;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="invoice">
+        <h2>HÓA ĐƠN BÁN HÀNG</h2>
+        <p><strong>Ngày đặt hàng:</strong> ${ngay}</p>
+        <p><strong>Khách hàng:</strong> ${kh}</p>
+        <p><strong>Số điện thoại:</strong> ${phone}</p>
+        <p><strong>Điạ chỉ:</strong> ${diaChi}</p>
+        
+        <p><strong>Phương thức TT:</strong> ${pay}</p>
+
+        <p><strong>Chi tiết đơn hàng</strong></p>
+        <table class="invoice-table">
+  <thead>
+    <tr>
+      <th>Mã SP</th>
+      <th>Số lượng</th>
+      <th>Đơn giá</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${invoice.hoaDonChiTiets
+            .filter(item => item.isDeleted === false)      // chỉ lấy chi tiết chưa bị xóa
+            .map(item => {
+                const price = (item.giaKhuyenMai != null && item.giaKhuyenMai > 0)
+                    ? item.giaKhuyenMai
+                    : item.giaGoc;
+                return `
+          <tr>
+            <td>${item.sanPhamChiTiet.id}</td>
+            <td>${item.soLuong}</td>
+            <td>${formatCurrencyVN(price)} VND</td>
+          </tr>
+        `;
+            })
+            .join('')}
+  </tbody>
+</table>
+
+
+        <div class="totals">
+          <p><strong>Phí vận chuyển:</strong> ${ship}</p>
+          <p><strong>Giảm giá:</strong> ${disc}</p>
+          <p><strong>Thành tiền:</strong> ${total}</p>
+        </div>
+      </div>
+    </body>
+  </html>`;
+
+        // Mở cửa sổ in
+        const w = window.open('', '_blank', 'width=420,height=700');
+        w.document.open();
+        w.document.write(html);
+        w.document.close();
+        w.onload = () => {
+            w.focus();
+            w.print();
+        };
+    }
+
+
+
+
+
+
+
+
+
 
 
 });
