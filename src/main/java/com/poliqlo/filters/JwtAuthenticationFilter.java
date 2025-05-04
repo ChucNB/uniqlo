@@ -1,5 +1,6 @@
 package com.poliqlo.filters;
 
+import com.poliqlo.controllers.common.auth.service.AuthService;
 import com.poliqlo.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
 
     private final UserDetailsService userDetailsService;
+    private final AuthService authService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -83,6 +85,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         email = jwtUtils.extractEmail(jwt);
+
+
         if (email!=null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails =userDetailsService.loadUserByUsername(email);
             if (jwtUtils.isTokenValid(jwt, userDetails,response)) {

@@ -4,6 +4,9 @@ import com.poliqlo.repositories.TaiKhoanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,5 +34,16 @@ public class BeanConfig {
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        return new LettuceConnectionFactory(); // dùng Lettuce (mặc định)
+    }
+
+    @Bean
+    public RedisTemplate<String, String> redisTemplate() {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        return redisTemplate;
     }
 }

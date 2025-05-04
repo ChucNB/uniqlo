@@ -43,6 +43,7 @@ dependencies {
     implementation 'io.prometheus:simpleclient:0.16.0'
     implementation 'io.prometheus:simpleclient_spring_boot:0.16.0'
     implementation 'io.prometheus:simpleclient_httpserver:0.16.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     testImplementation 'org.springframework.security:spring-security-test'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

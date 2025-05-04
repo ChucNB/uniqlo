@@ -143,6 +143,8 @@ public class BanHangController {
         lshd.setMoTa("Hóa đơn mua hàng tại quầy được xử lý bởi " + authService.getCurrentUsername().orElse("hệ thống"));
         lshd.setTieuDe("Hóa đơn mua hàng tại quầy");
         lshd.setThoiGian(LocalDateTime.now());
+        lshd.setHoaDon(newHoaDon);
+        lshd.setTaiKhoan(authService.getCurrentUserDetails().get());
         productTempRepository.deleteAllByIdInBatch(newHoaDon.getHoaDonChiTiets().stream().mapToInt(hdct->hdct.getSanPhamChiTiet().getId()).boxed().toList());
         newHoaDon.setLichSuHoaDons(List.of(lshd));
         newHoaDon.getHoaDonChiTiets().forEach((element) -> {

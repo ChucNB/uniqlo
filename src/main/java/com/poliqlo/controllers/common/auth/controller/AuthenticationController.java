@@ -2,6 +2,7 @@ package com.poliqlo.controllers.common.auth.controller;
 
 import com.poliqlo.controllers.common.auth.model.request.SignInRequest;
 import com.poliqlo.controllers.common.auth.model.request.SignUpRequest;
+import com.poliqlo.controllers.common.auth.service.AuthService;
 import com.poliqlo.models.KhachHang;
 import com.poliqlo.models.TaiKhoan;
 import com.poliqlo.utils.JwtUtils;
@@ -30,6 +31,7 @@ public class AuthenticationController {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final AuthService authService;
     @Value("${jwt.expiration}")
     private  int expiration;
     @PostMapping("/sign-in")

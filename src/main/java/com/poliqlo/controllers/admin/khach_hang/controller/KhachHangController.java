@@ -4,9 +4,7 @@ import com.poliqlo.controllers.admin.khach_hang.service.KhachHangService;
 import com.poliqlo.controllers.admin.nhan_vien.service.TaiKhoanService;
 import com.poliqlo.controllers.common.file.service.BlobStoreService;
 import com.poliqlo.models.KhachHang;
-import com.poliqlo.models.NhanVien;
 import com.poliqlo.models.TaiKhoan;
-import com.poliqlo.repositories.KhachHangRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +18,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 
 @Controller
 @RequestMapping("/admin/khach-hang")
@@ -86,6 +83,8 @@ public class KhachHangController {
         taiKhoan.setSoDienThoai(soDienThoai);
         taiKhoan.setPassword(passwordEncoder.encode(password));
         taiKhoan.setRole(TaiKhoan.Role.ROLE_USER);
+        taiKhoan.setIsEnable(true);
+        taiKhoan.setIsDeleted(false);
         if (!file.isEmpty()) {
             try {
                 var blobResponse = blobStoreService.upload(file);

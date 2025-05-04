@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -39,7 +38,8 @@ public class JwtUtils {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> claim= Map.of("ROLE", userDetails.getAuthorities().stream().findFirst().get().getAuthority());
+        return generateToken(claim, userDetails);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails, HttpServletResponse response) throws IOException {
@@ -63,7 +63,7 @@ public class JwtUtils {
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration * 1000))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpiration *1000))
                 .signWith(signingKey)
                 .compact();
     }

@@ -1,5 +1,6 @@
 package com.poliqlo.configurations;
 
+import com.poliqlo.controllers.common.auth.service.AuthService;
 import com.poliqlo.filters.JwtAuthenticationFilter;
 import com.poliqlo.models.KhachHang;
 import com.poliqlo.models.TaiKhoan;
@@ -87,7 +88,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, KhachHangRepository khachHangRepository) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, KhachHangRepository khachHangRepository, AuthService authService) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
 //                .sessionManagement(session -> session
@@ -133,6 +134,7 @@ public class SecurityConfig {
                                     Authentication auth = new UsernamePasswordAuthenticationToken(taiKhoan, null, authorities);
                                     SecurityContextHolder.getContext().setAuthentication(auth);
                                     response.sendRedirect("/home");
+                                    //Todo xử lý jwt 
 
                                 } else {
                                     response.sendRedirect("/sign-in?error=423");

@@ -1,6 +1,8 @@
 package com.poliqlo.controllers.common.auth.service;
 
 import com.poliqlo.models.TaiKhoan;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,8 +10,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class AuthService {
+
+    private final RedisTemplate<String, String> redisTemplate;
+
 
     public Optional<String> getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -60,4 +66,5 @@ public class AuthService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal());
     }
+
 }

@@ -84,7 +84,7 @@ public class HoaDon {
     @JsonManagedReference
     private List<HoaDonChiTiet> hoaDonChiTiets = new ArrayList<>();
 
-    @OneToMany(mappedBy = "hoaDon")
+    @OneToMany(mappedBy = "hoaDon", cascade = CascadeType.PERSIST)
     @JsonManagedReference
     private List<LichSuHoaDon> lichSuHoaDons = new ArrayList<>();
 

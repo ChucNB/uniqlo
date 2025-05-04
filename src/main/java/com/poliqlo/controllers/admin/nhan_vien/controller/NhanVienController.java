@@ -88,7 +88,8 @@ public class NhanVienController {
         taiKhoan.setSoDienThoai(soDienThoai);
         taiKhoan.setRole(role);
         taiKhoan.setPassword(passwordEncoder.encode(password));
-        taiKhoan.setIsEnable(false);
+        taiKhoan.setIsEnable(true);
+        taiKhoan.setIsDeleted(false);
 
         if (!file.isEmpty()) {
             try {
