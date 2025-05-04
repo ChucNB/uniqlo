@@ -35,9 +35,9 @@
             <span id="messageRP" class="d-none" th:text="${messageResponse.message}"></span>
             <span id="successRP" class="d-none" th:text="${messageResponse.success}"></span>
         </div>
-        <div th:if="${messagePayments != null}">
-            <span th:text="${messagePayments}" class="text-danger font-weight-bold text-lg"></span>
-        </div>
+<!--        <div th:if="${messagePayments != null}">-->
+<!--            <span th:text="${messagePayments}" class="text-danger font-weight-bold text-lg"></span>-->
+<!--        </div>-->
     </div>
     <div class="row">
         <div class="col-md-8">
@@ -118,7 +118,7 @@
 
                 <div class="d-flex justify-content-between align-items-center">
                     <h4 class="text-warning">
-                        <i class="fa-solid fa-ticket"></i> <span>voucher</span>
+                        <i class="fa-solid fa-ticket"></i> <span>Voucher</span>
                     </h4>
                     <a id="btnChonVouchers" type="button" class="" data-bs-toggle="modal" data-bs-target="#customModal">
                         Chọn phiếu giảm giá
@@ -168,7 +168,7 @@
                                                                    class="text-danger font-weight-bold">0 ₫</span>
                     </h4>
                     <button id="btnThanToan" class="btn w-100 py-2 fw-bold mt-2"
-                            style="background-color: orange; display: none">Tến
+                            style="background-color: orange; display: none">Tiến
                         Hành Thanh Toán
                     </button>
                 </form>

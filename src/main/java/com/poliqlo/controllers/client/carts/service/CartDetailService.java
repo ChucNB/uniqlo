@@ -140,12 +140,13 @@ public class CartDetailService {
             BigDecimal totalMoney = BigDecimal.valueOf(newQuantity).multiply(sanPhamChiTiet.getGiaBan());
             // So sánh với 5,000,000
             BigDecimal limit = BigDecimal.valueOf(5000000);
+            messageResponse=new MessageResponse();
             if (newQuantity > defaultQuantity) {
-                thongBao = "số thêm đã vượt quá số luong của cửa hàng";
+                thongBao = "Số thêm đã vượt quá số luong của cửa hàng";
                 messageResponse.setMessage(thongBao);
                 messageResponse.setSuccess(false);
             } else if (totalMoney.compareTo(limit) >= 0) {
-                thongBao = "số thêm không được vượt quá 5 triệu đồng !";
+                thongBao = "Số tiền tối đa là 5 triệu, vui lòng liên hệ với chúng tôi để nhận những ưu đãi dành riêng cho bạn!";
                 messageResponse.setMessage(thongBao);
                 messageResponse.setSuccess(false);
             } else {
@@ -177,7 +178,7 @@ public class CartDetailService {
                 messageResponse.setMessage(thongBao);
                 messageResponse.setSuccess(false);
             } else if (totalMoney.compareTo(limit) >= 0) {
-                thongBao = "số thêm không được vượt quá 5 triệu đồng !";
+                thongBao = "Số tiền tối đa là 5 triệu, vui lòng liên hệ với chúng tôi để nhận những ưu đãi dành riêng cho bạn !";
                 messageResponse.setMessage(thongBao);
                 messageResponse.setSuccess(false);
             } else {
@@ -332,5 +333,9 @@ public class CartDetailService {
 
     public MessageResponse getMessageResponse() {
         return messageResponse;
+    }
+
+    public static void setMessageResponse(MessageResponse messageResponse) {
+        CartDetailService.messageResponse = messageResponse;
     }
 }

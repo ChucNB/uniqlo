@@ -111,11 +111,11 @@
                     <input type="radio" class="btn-check" name="btnradio" id="btnradio1" value="COD" autocomplete="off"
                            checked>
                     <label class="btn btn-outline-warning" for="btnradio1">COD</label>
-                    <input type="radio" class="btn-check" name="btnradio" id="btnradio2" value="VNPAY"
+                    <input type="radio" class="btn-check" disabled name="btnradio" id="btnradio2" value="VNPAY"
                            autocomplete="off">
                     <label class="btn btn-outline-warning" for="btnradio2">VNPAY</label>
                 </div>
-                <input type="text" class="form-control" placeholder="Ghi chu cho shop" id="ghiChuText">
+                <input type="text" class="form-control" placeholder="Ghi chú cho cửa hàng" id="ghiChuText">
             </div>
             <form method="post" th:action="@{/cart/save-bill}" th:object="${bill}" id="formDatHang">
                 <input type="hidden" id="billCustomerID" name="customerId" th:field="*{customerId}">

@@ -1926,7 +1926,7 @@ function checkout(invoice) {
         $(this)[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
     })
 
-    $('#hd-voucher').on('select2:select select2:unselect', function () {
+    $('#hd-voucher').on('select2:select select2:unselect change', function () {
         if($(this).val().length==0){
             currentPhieuGiamGia=null;
             applyVoucher(undefined);
@@ -2048,43 +2048,64 @@ function applyVoucher(response) {
     $('#hd-khach-tra').text(toCurrency(totalPrice - getGiaTriGiam(totalPrice)));
     updateBillStep2(totalPrice,getGiaTriGiam(totalPrice));
 }
-function updateVoucherSelect(){
-    console.log(selectedKhachHang)
-    $('#hd-voucher').select2({
-        placeholder: "Chọn mã giảm giá",
-        ajax: {
-            url: `/admin/api/v1/sale/promotion?price=${totalPrice}${selectedKhachHang?("&idKH="+selectedKhachHang.id):""}`,
-            delay: 500,
-            data: function (params) {
-                return {
-                    q: params.term,
-                    page: params.page || 0,
-                    pageSize: 10
-                };
-            },
-            processResults: function (data) {
-                
-                currentPhieuGiamGias=data.content
-                return {
-                    results: data.content,
-                    pagination: {
-                        more: !data.last
-                    }
-                };
+var bestVoucherId=null;
+function updateVoucherSelect() {
+    console.log(selectedKhachHang);
+
+    function getGiaTriGiam(voucher, tongTien) {
+        if (voucher.loaiHinhGiam === "PHAN_TRAM") {
+            let giam = tongTien * voucher.giaTriGiam / 100;
+            return giam > voucher.giamToiDa ? voucher.giamToiDa : giam;
+        } else {
+            return voucher.giaTriGiam > tongTien ? tongTien : voucher.giaTriGiam;
+        }
+    }
+
+    // Gọi AJAX thủ công để lấy danh sách trước
+    $.ajax({
+        url: `/admin/api/v1/sale/promotion?price=${totalPrice}${selectedKhachHang ? "&idKH=" + selectedKhachHang.id : ""}`,
+        method: "GET",
+        data: {
+            page: 0,
+            pageSize: 10
+        },
+        success: function (data) {
+            const vouchers = data.content || [];
+            currentPhieuGiamGias = vouchers;
+
+
+            if (vouchers.length > 0) {
+                const bestVoucher = vouchers.sort((a, b) => {
+                    return getGiaTriGiam(b, totalPrice) - getGiaTriGiam(a, totalPrice);
+                })[0];
+                bestVoucherId = bestVoucher.id;
             }
 
+            // Khởi tạo Select2 với dữ liệu đã có
+            $('#hd-voucher').select2({
+                placeholder: "Chọn mã giảm giá",
+                data: vouchers.map(v => ({
+                    id: v.id,
+                    text: v.tenPhieu || v.maPhieu || `Voucher ${v.id}`
+                })),
+                maximumSelectionLength: 1
+            });
+
+
+
+            // Áp dụng giảm giá
+            applyVoucher(undefined);
         },
-        maximumSelectionLength: 1
-
-
+        error: function () {
+            console.error("Không thể tải danh sách voucher");
+            $('#hd-voucher').empty().select2({
+                placeholder: "Chọn mã giảm giá",
+                data: []
+            });
+        }
     });
-    $('#hd-voucher').val([]).trigger('change');
-    applyVoucher(undefined)
-
-
-
-
 }
+
 document.addEventListener("keydown", function (event) {
     if (event.key === "F2") {
         event.preventDefault();
@@ -2226,7 +2247,16 @@ $(document).ready(()=>{
             $('#offcanvas-check-out').offcanvas('hide');
             $('#offcanvas-check-out-step-2').offcanvas('show');
             updateVoucherSelect()
+            setTimeout(()=>{
+                if (bestVoucherId) {
+                    $('#hd-voucher').val(bestVoucherId).trigger('change');
+                } else {
+                    $('#hd-voucher').val([]).trigger('change');
+                }
+            },200)
         }
+        // Gán giá trị đã chọn nếu có
+
     });
     $('#offcanvas-check-out-step-2 > div.offcanvas-header > button').on('click', function () {
         $('#offcanvas-check-out').offcanvas('show');
@@ -2238,6 +2268,7 @@ $(document).ready(()=>{
         setTimeout(()=>{
             $('.qrcode')[0].scrollIntoView({ behavior: 'smooth', block: 'center' });},200);
     })
+
 
 })
 

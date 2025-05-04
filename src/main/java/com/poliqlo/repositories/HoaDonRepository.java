@@ -103,16 +103,16 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Integer>, JpaSpe
 
     long countAllByTrangThaiIn(List<String> trangThai);
 
-    @Query("SELECT SUM(hd.tongTien) FROM HoaDon hd where hd.ngayTao> CURRENT_DATE AND (hd.isDeleted = false or hd.isDeleted=null) AND (hd.trangThai != 'DA_HUY'  or hd.trangThai != 'GIAO_HANG_THAT_BAI' or hd.trangThai != 'CHO_CHUYEN_HOAN') ")
+    @Query("SELECT SUM(hd.tongTien) FROM HoaDon hd where hd.ngayTao> CURRENT_DATE AND (hd.isDeleted = false or hd.isDeleted=null) AND (hd.trangThai != 'DA_HUY'  and hd.trangThai != 'GIAO_HANG_THAT_BAI' and hd.trangThai != 'CHO_CHUYEN_HOAN') ")
     Optional<Long> getDaylyRevenue();
 
     @Query("SELECT SUM(hd.tongTien) FROM HoaDon hd " +
-            "WHERE hd.ngayTao >= FUNCTION('DATE_FORMAT', CURRENT_DATE, '%Y-%m-01') AND (hd.isDeleted = false or hd.isDeleted=null) AND (hd.trangThai != 'DA_HUY'  or hd.trangThai != 'GIAO_HANG_THAT_BAI' or hd.trangThai != 'CHO_CHUYEN_HOAN')")
+            "WHERE hd.ngayTao >= FUNCTION('DATE_FORMAT', CURRENT_DATE, '%Y-%m-01') AND (hd.isDeleted = false or hd.isDeleted=null) AND (hd.trangThai != 'DA_HUY'  and hd.trangThai != 'GIAO_HANG_THAT_BAI' and hd.trangThai != 'CHO_CHUYEN_HOAN')")
     Optional<Long> getMonthlyRevenue();
 
     @Query(value = "SELECT COALESCE(SUM(tong_tien), 0) FROM hoa_don hd " +
             "WHERE NGAY_TAO >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01') " +
-            "AND NGAY_TAO < DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-%d') AND hd.IS_DELETED = false AND (hd.TRANG_THAI != 'DA_HUY'  or hd.TRANG_THAI != 'GIAO_HANG_THAT_BAI' or hd.TRANG_THAI != 'CHO_CHUYEN_HOAN')",
+            "AND NGAY_TAO < DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-%d') AND hd.IS_DELETED = false AND (hd.TRANG_THAI != 'DA_HUY'  and hd.TRANG_THAI != 'GIAO_HANG_THAT_BAI' and hd.TRANG_THAI != 'CHO_CHUYEN_HOAN')",
             nativeQuery = true)
     Optional<Long> getSamePeriodLastMonthRevenue();
 
@@ -125,7 +125,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Integer>, JpaSpe
     @Query("select concat(hdct.sanPhamChiTiet.sanPham.ten,' ',hdct.sanPhamChiTiet.mauSac.ten) as ten,sum(hdct.soLuong) as total_quantity, avg(hdct.giaKhuyenMai)  from HoaDonChiTiet hdct where " +
             "hdct.hoaDon.ngayTao<=:toDate and hdct.hoaDon.ngayTao>=:fromDate " +
             "AND (hdct.hoaDon.isDeleted = false or hdct.hoaDon.isDeleted=null) " +
-            "AND (hdct.hoaDon.trangThai != 'DA_HUY'  or hdct.hoaDon.trangThai != 'GIAO_HANG_THAT_BAI' or hdct.hoaDon.trangThai != 'CHO_CHUYEN_HOAN') " +
+            "AND (hdct.hoaDon.trangThai != 'DA_HUY'  and hdct.hoaDon.trangThai != 'GIAO_HANG_THAT_BAI' and hdct.hoaDon.trangThai != 'CHO_CHUYEN_HOAN') " +
             "group by ten " +
             "order by total_quantity desc ")
     List<Object[]> getTop10SanPhamBanChayNhat(LocalDateTime fromDate, LocalDateTime toDate, Limit limit);
@@ -139,7 +139,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Integer>, JpaSpe
             "from HoaDonChiTiet hdct where " +
             "hdct.hoaDon.ngayTao<=:toDate and hdct.hoaDon.ngayTao>=:fromDate " +
             "AND (hdct.hoaDon.isDeleted = false or hdct.hoaDon.isDeleted=null) " +
-            "AND (hdct.hoaDon.trangThai != 'DA_HUY'  or hdct.hoaDon.trangThai != 'GIAO_HANG_THAT_BAI' or hdct.hoaDon.trangThai != 'CHO_CHUYEN_HOAN') " +
+            "AND (hdct.hoaDon.trangThai != 'DA_HUY'  and hdct.hoaDon.trangThai != 'GIAO_HANG_THAT_BAI' and hdct.hoaDon.trangThai != 'CHO_CHUYEN_HOAN') " +
             "group by ten ")
 //            "order by :orderBy desc ")
     List<Object[]> getTop10SanPham(LocalDateTime fromDate, LocalDateTime toDate, Sort orderBy, Limit limit);

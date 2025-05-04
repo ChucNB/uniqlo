@@ -1,9 +1,6 @@
 package com.poliqlo.controllers.client.carts;
 
-import com.poliqlo.controllers.client.carts.dto.BillRequestDTO;
-import com.poliqlo.controllers.client.carts.dto.CartDetailResponseDTO;
-import com.poliqlo.controllers.client.carts.dto.DataRequest;
-import com.poliqlo.controllers.client.carts.dto.QuantityRequest;
+import com.poliqlo.controllers.client.carts.dto.*;
 import com.poliqlo.controllers.client.carts.service.CartDetailService;
 import com.poliqlo.controllers.common.auth.service.AuthService;
 import com.poliqlo.models.DiaChi;
@@ -41,6 +38,7 @@ public class CartClientController {
         model.addAttribute("messageResponse", service.getMessageResponse());
         model.addAttribute("carts", responseDTOList);
         model.addAttribute("messagePayments", messagePayments);
+        CartDetailService.setMessageResponse(new MessageResponse());
         return "client/cart";
     }
 
@@ -167,7 +165,7 @@ public class CartClientController {
             return "redirect:/cart/all";
         }
         messagePayments = null;
-        return "redirect:/";
+        return "redirect:/lichsumuahang";
     }
 
     @GetMapping("/api/get-total-product-in-cart")

@@ -603,7 +603,7 @@
           <div class="product-quantity-placeholder">SL</div>
           <div class="product-total-placeholder">Thành tiền</div>
         </div>
-        <div class="product-row" th:each="ct : ${chiTiets}">
+        <div class="product-row"  th:each="ct : ${chiTiets}">
           <img th:if="${ct.sanPhamChiTiet != null && ct.sanPhamChiTiet.sanPham != null && ct.sanPhamChiTiet.sanPham.anhUrl != null}"
                th:src="${ct.sanPhamChiTiet.sanPham.anhUrl}"
                alt="Ảnh sản phẩm" class="product-image">

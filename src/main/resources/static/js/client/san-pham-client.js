@@ -522,7 +522,7 @@ function updateTotalAmount(prod) {
             var totalAmount = quantity * effectivePrice;
             $("#modal-total").text("Tổng tiền: " + totalAmount.toLocaleString() + " VNĐ");
             if (totalAmount > 5000000) {
-                $("#modal-total-warning").text("Tổng tiền vượt quá 5 triệu VNĐ!").css("color", "red");
+                $("#modal-total-warning").text("Số tiền tối đa là 5 triệu, vui lòng liên hệ với chúng tôi để nhận những ưu đãi dành riêng cho bạn!").css("color", "red");
             } else {
                 $("#modal-total-warning").text("");
             }
@@ -594,7 +594,7 @@ $("#modal-form").on("submit", function(e) {
         Swal.fire({
             icon: 'error',
             title: 'Giới hạn mua!',
-            text: 'Tổng tiền mua phải dưới 5 triệu VNĐ.'
+            text: 'Số tiền tối đa là 5 triệu, vui lòng liên hệ với chúng tôi để nhận những ưu đãi dành riêng cho bạn.'
         });
         return;
     }

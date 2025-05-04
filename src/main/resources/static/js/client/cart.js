@@ -205,12 +205,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // Nếu message hoặc success thay đổi => hiển thị thông báo
         if (message !== lastMessage || success !== lastSuccess) {
             Swal.fire({
-                position: "top-end",
                 icon: success.trim() === "true" ? "success" : "error",
                 width: '400px',
                 title: message,
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 3000,
                 customClass: {
                     title: 'small-title',
                     popup: 'small-popup'
@@ -218,8 +217,8 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             // Lưu lại message và success vào sessionStorage
-            sessionStorage.setItem("lastMessageRP", message);
-            sessionStorage.setItem("lastSuccessRP", success);
+            // sessionStorage.setItem("lastMessageRP", message);
+            // sessionStorage.setItem("lastSuccessRP", success);
         }
     }
 });

@@ -53,7 +53,7 @@ public class SecurityConfig {
             "/admin/**"
     };
     public static final String[] adminOnlyUrls = {
-            "/admin/nhan-vien/**","/admin"
+            "/admin/nhan-vien/**","/admin","/admin/dot-giam-gia/**"
     };
 
     private final TaiKhoanRepository taiKhoanRepository;

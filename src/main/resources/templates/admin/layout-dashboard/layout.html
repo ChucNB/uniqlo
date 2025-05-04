@@ -101,7 +101,7 @@
         </li>
 
         <!-- Nav Item - Charts -->
-        <li class="nav-item">
+        <li class="nav-item" th:if="${@authService.getCurrentRole().orElse('ROLE_USER').equals('ROLE_ADMIN')}">
             <a class="nav-link" href="/admin/dot-giam-gia/all">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>Đợt Giảm giá</span></a>

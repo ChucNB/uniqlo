@@ -258,7 +258,7 @@ function renderProductDetail(prod) {
         const total = effectivePrice * quantity;
         let html = `<div><strong>Tổng:</strong> ${formatCurrencyVND(total)}</div>`;
         if (total > 5000000) {
-            html += `<div class="text-danger">Số tiền tối đa là 5 triệu, vui lòng đặt hàng lại hoặc liên hệ với chúng tôi!</div>`;
+            html += `<div class="text-danger">Số tiền tối đa là 5 triệu, vui lòng liên hệ với chúng tôi để nhận những ưu đãi dành riêng cho bạn!</div>`;
         }
         totalPriceMsgEl.innerHTML = html;
     }

@@ -93,9 +93,9 @@ public class ThongKeController {
         double thanhCong,dangXuLy,dangGiaoHang,huy,giaoHangThatBai;
 
 
-        long dailyRevenue = 100000L;
-        long monthlyRevenue= 100000L;
-        long revenueLastMonth=10000L;
+        long dailyRevenue = 0L;
+        long monthlyRevenue= 0L;
+        long revenueLastMonth=0L;
         int totalPendingBills=0;
 
         List<Object[]> top10SanPham =hoaDonRepository.getTop10SanPham(fromDate.atStartOfDay(),toDate.plusDays(1).atStartOfDay(), Sort.by(Sort.Direction.DESC,orderBy), Limit.of(top));

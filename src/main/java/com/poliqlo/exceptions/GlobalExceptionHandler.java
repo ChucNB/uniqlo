@@ -9,6 +9,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.HashMap;
@@ -21,7 +22,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         String field = ex.getName();
         String message = String.format("Tham số không hợp lệ", field);
-
+ex.printStackTrace();
         return ResponseEntity
                 .badRequest()
                 .body(Map.of("error", message));
@@ -31,14 +32,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<Map<String, String>> handleMissingParam(MissingServletRequestParameterException ex) {
         String message = String.format("Thiếu tham số bắt buộc: %s", ex.getParameterName());
+        ex.printStackTrace();
         return ResponseEntity
                 .badRequest()
                 .body(Map.of("error", message));
+    }
+    @ExceptionHandler(NoResourceFoundException.class)
+    public Object handleNoResourceFoundException(NoResourceFoundException ex) {
+        ex.printStackTrace();
+        return new RedirectView("/error/404.html");
     }
 
     // Xử lý lỗi validation từ @Valid + BindingResult
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException ex) {
+        ex.printStackTrace();
         String message = ex.getBindingResult().getFieldErrors()
                 .stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
@@ -49,7 +57,7 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(AuthorizationDeniedException.class)
     public Object handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
-
+        ex.printStackTrace();
         return new RedirectView("/error/403.html");
 
     }
