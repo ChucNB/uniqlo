@@ -994,11 +994,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 var totalAmount = quantity * effectivePrice;
                 $("#modal-total").text("Tổng tiền: " + totalAmount.toLocaleString() + " VNĐ");
 
-                if (totalAmount > 5000000) {
-                    $("#modal-total-warning").text("Tổng tiền vượt quá 5 triệu VNĐ!").css("color", "red");
-                } else {
-                    $("#modal-total-warning").text("");
-                }
                 return;
             }
         }
@@ -1491,11 +1486,11 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="invoice">
         <h2>HÓA ĐƠN BÁN HÀNG</h2>
         <p><strong>Ngày đặt hàng:</strong> ${ngay}</p>
-        <p><strong>Khách hàng:</strong> ${kh} (${phone})</p>
+        <p><strong>Khách hàng:</strong> ${kh}</p>
+        <p><strong>Số điện thoại:</strong> ${phone}</p>
         <p><strong>Điạ chỉ:</strong> ${diaChi}</p>
         
         <p><strong>Phương thức TT:</strong> ${pay}</p>
-        <p><strong>Trạng thái:</strong> ${stt}</p>
 
         <p><strong>Chi tiết đơn hàng</strong></p>
         <table class="invoice-table">
@@ -1517,7 +1512,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <tr>
             <td>${item.sanPhamChiTiet.id}</td>
             <td>${item.soLuong}</td>
-            <td class="right">${formatCurrencyVN(price)} VND</td>
+            <td>${formatCurrencyVN(price)} VND</td>
           </tr>
         `;
             })
